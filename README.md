@@ -10,5 +10,5 @@ git clone https://github.com/Hat3ter/e-wallet.git
 cd e-wallet
 ```
 ```
-docker compose-up
+docker compose up
 ```

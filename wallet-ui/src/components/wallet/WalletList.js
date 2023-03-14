@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from "react";
 import Wallet from "./Wallet";
-import NewCardModal from "../operations/NewCardModal";
+import AddNewCard from "../operations/NewCardModal";
 import {connect, useDispatch, useSelector} from "react-redux";
-import {initCards} from "../../redux/cardActions";
 import store from "../../redux/store";
+import {getWallets} from "../../operations/operations";
 
 function WalletList(props) {
 
@@ -13,38 +13,18 @@ function WalletList(props) {
     const [error, setError] = useState();
 
     useEffect(() => {
-
-        const fetchData = async () => {
-            const data = await fetch('http://localhost:8080/wallets',{
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization':  props.token,
-                }
-            });
-            const json = await data.json();
-            dispatch(initCards(json.data))
-        }
-        fetchData().catch(console.error)
+        getWallets(props, dispatch);
     }, [cardSelector, dispatch]);
-
-
-    function openAddCard() {
-        console.log("modal")
-        setShowAddCard(!showAddCard);
-    }
 
     function renderError() {
         if (error) {
-            return <p className="alert-danger align-content-center">{error}</p>
+            return <p>{error}</p>
         }
     }
 
     return (
         <div className="container">
             {renderError()}
-
             <div className="d-flex align-content-around flex-wrap">
                 {store.getState().map(value => {
                     return <div key={value.id} className="p-2">
@@ -52,9 +32,8 @@ function WalletList(props) {
                     </div>
                 })}
             </div>
-
-            <i className="bi bi-file-plus" onClick={() => openAddCard()}></i>
-            <NewCardModal token={props.token} hiden={showAddCard} setShowAddCard={setShowAddCard} setError={setError}/>
+            <i className="bi bi-file-plus" onClick={() => setShowAddCard(!showAddCard)}></i>
+            <AddNewCard token={props.token} hiden={showAddCard} setShowAddCard={setShowAddCard} setError={setError}/>
         </div>
     )
 }

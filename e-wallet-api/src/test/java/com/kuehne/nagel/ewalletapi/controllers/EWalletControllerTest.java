@@ -6,6 +6,7 @@ import com.kuehne.nagel.ewalletapi.models.requests.CreateWalletRequest;
 import com.kuehne.nagel.ewalletapi.models.requests.TransferMoneyRequest;
 import com.kuehne.nagel.ewalletapi.models.requests.WalletCashInRequest;
 import com.kuehne.nagel.ewalletapi.models.requests.WalletCashOutRequest;
+import com.kuehne.nagel.ewalletapi.security.JwtTokenService;
 import com.kuehne.nagel.ewalletapi.services.wallet.WalletService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;

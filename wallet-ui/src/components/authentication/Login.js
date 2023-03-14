@@ -1,5 +1,4 @@
 import React, {useState} from 'react';
-import PropTypes from 'prop-types';
 
 export default function Login({setToken}) {
 
@@ -17,37 +16,30 @@ export default function Login({setToken}) {
                 "login": username,
                 "password": password
             })
-        })
-            .then(data => data.json())
-
-        console.log("!!!",tokenRaw)
+        }).then(data => data.json())
         const token = JSON.stringify(tokenRaw);
         if (token.includes("Bearer")) {
-
             setToken(tokenRaw.data);
         }
     }
 
     return (
-        <div className="login-wrapper">
-            <h1>Please Log In</h1>
-            <form onSubmit={handleSubmit}>
-                <label>
-                    <p>Username</p>
-                    <input type="text" onChange={e => setUserName(e.target.value)}/>
-                </label>
-                <label>
-                    <p>Password</p>
-                    <input type="password" onChange={e => setPassword(e.target.value)}/>
-                </label>
-                <div>
-                    <button type="submit">Submit</button>
-                </div>
-            </form>
+        <div className="container">
+            <div className="login-wrapper">
+                <form className="row" onSubmit={handleSubmit}>
+                    <div className="mb-3">
+                        <label htmlFor="inputLogin" className="form-label">Email address</label>
+                        <input type="text" className="form-control" id="inputLogin"
+                               onChange={e => setUserName(e.target.value)}/>
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="inputPassword" className="form-label">Password</label>
+                        <input type="password" className="form-control" id="inputPassword"
+                               onChange={e => setPassword(e.target.value)}/>
+                    </div>
+                    <button type="submit" className="btn btn-primary">Submit</button>
+                </form>
+            </div>
         </div>
     )
 }
-
-Login.propTypes = {
-    setToken: PropTypes.func.isRequired
-};

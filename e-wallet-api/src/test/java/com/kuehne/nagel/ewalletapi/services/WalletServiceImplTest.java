@@ -1,5 +1,6 @@
 package com.kuehne.nagel.ewalletapi.services;
 
+import com.kuehne.nagel.ewalletapi.models.dtos.UserDetailDto;
 import com.kuehne.nagel.ewalletapi.models.dtos.WalletDto;
 import com.kuehne.nagel.ewalletapi.models.entities.Wallet;
 import com.kuehne.nagel.ewalletapi.models.requests.CreateWalletRequest;
@@ -11,7 +12,13 @@ import com.kuehne.nagel.ewalletapi.services.wallet.WalletService;
 import com.kuehne.nagel.ewalletapi.services.wallet.WalletServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -22,17 +29,28 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(SpringExtension.class)
+@AutoConfigureMockMvc()
 public class WalletServiceImplTest {
 
     private WalletRepository walletRepository;
 
     private WalletService walletService;
 
+    private static final UUID USER_ID = UUID.randomUUID();
+
+
     @BeforeEach
     public void setup() {
 
         walletRepository = Mockito.mock(WalletRepository.class);
         walletService = new WalletServiceImpl(walletRepository);
+        UserDetailDto userDetails = new UserDetailDto();
+        userDetails.setId(USER_ID);
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
     }
 
     @Test
@@ -44,14 +62,14 @@ public class WalletServiceImplTest {
         wallet.setName("My Wallet");
         wallet.setBalance(BigDecimal.valueOf(100));
         wallet.setCurrencyType("USD");
-        when(walletRepository.findById(walletId)).thenReturn(Optional.of(wallet));
+        when(walletRepository.findByIdAndUserId(walletId, USER_ID)).thenReturn(Optional.of(wallet));
 
         WalletDto walletDto = walletService.getWalletById(walletId);
 
-        assertEquals(walletDto.getId(), walletId);
-        assertEquals(walletDto.getName(), "My Wallet");
-        assertEquals(walletDto.getBalance(), BigDecimal.valueOf(100));
-        assertEquals(walletDto.getCurrencyType(), "USD");
+        assertEquals(walletId, walletDto.getId());
+        assertEquals("My Wallet", walletDto.getName());
+        assertEquals(BigDecimal.valueOf(100), walletDto.getBalance());
+        assertEquals("USD", walletDto.getCurrencyType());
     }
 
     @Test
@@ -68,19 +86,20 @@ public class WalletServiceImplTest {
         wallet2.setBalance(BigDecimal.valueOf(200));
         wallet2.setCurrencyType("USD");
         List<Wallet> wallets = Arrays.asList(wallet1, wallet2);
-        when(walletRepository.findAll()).thenReturn(wallets);
+        when(walletRepository.findAllByUserId(USER_ID)).thenReturn(wallets);
 
         List<WalletDto> walletDtos = walletService.getWalletsByUser();
 
-        assertEquals(walletDtos.size(), 2);
-        assertEquals(walletDtos.get(0).getId(), wallet1.getId());
-        assertEquals(walletDtos.get(0).getName(), wallet1.getName());
-        assertEquals(walletDtos.get(0).getBalance(), wallet1.getBalance());
-        assertEquals(walletDtos.get(0).getCurrencyType(), wallet1.getCurrencyType());
-        assertEquals(walletDtos.get(1).getId(), wallet2.getId());
-        assertEquals(walletDtos.get(1).getName(), wallet2.getName());
-        assertEquals(walletDtos.get(1).getBalance(), wallet2.getBalance());
-        assertEquals(walletDtos.get(1).getCurrencyType(), wallet2.getCurrencyType());
+        assertEquals(2, walletDtos.size());
+        assertEquals(wallet1.getId(), walletDtos.get(0).getId());
+        assertEquals(wallet1.getName(), walletDtos.get(0).getName());
+        assertEquals(wallet1.getBalance(), walletDtos.get(0).getBalance());
+        assertEquals(wallet1.getCurrencyType(), walletDtos.get(0).getCurrencyType());
+        assertEquals(wallet2.getId(), walletDtos.get(1).getId());
+        assertEquals(wallet2.getName(), walletDtos.get(1).getName());
+        assertEquals(wallet2.getBalance(), walletDtos.get(1).getBalance());
+        assertEquals(wallet2.getCurrencyType(), walletDtos.get(1).getCurrencyType());
+
     }
 
     @Test
@@ -93,9 +112,9 @@ public class WalletServiceImplTest {
 
         WalletDto walletDto = walletService.createWallet(request);
 
-        assertEquals(walletDto.getName(), "My Wallet");
-        assertEquals(walletDto.getBalance(), BigDecimal.ZERO);
-        assertEquals(walletDto.getCurrencyType(), "USD");
+        assertEquals("My Wallet", walletDto.getName());
+        assertEquals(BigDecimal.ZERO, walletDto.getBalance());
+        assertEquals("USD", walletDto.getCurrencyType());
     }
 
     @Test
@@ -107,19 +126,19 @@ public class WalletServiceImplTest {
         cashInRequest.setAmount(amount);
 
         Wallet wallet = new Wallet(walletId, "wallet", BigDecimal.ZERO, "USD", UUID.randomUUID());
-        when(walletRepository.findById(walletId)).thenReturn(Optional.of(wallet));
+        when(walletRepository.findByIdAndUserId(walletId, USER_ID)).thenReturn(Optional.of(wallet));
         when(walletRepository.save(wallet)).thenReturn(wallet);
 
         WalletDto walletDto = walletService.cashIn(walletId, cashInRequest);
 
-        Mockito.verify(walletRepository).findById(walletId);
+        Mockito.verify(walletRepository).findByIdAndUserId(walletId, USER_ID);
         Mockito.verify(walletRepository).save(wallet);
 
         assertEquals(amount, wallet.getBalance());
-        assertEquals(walletDto.getId(), wallet.getId());
-        assertEquals(walletDto.getBalance(), wallet.getBalance());
-        assertEquals(walletDto.getName(), wallet.getName());
-        assertEquals(walletDto.getCurrencyType(), wallet.getCurrencyType());
+        assertEquals(wallet.getId(), walletDto.getId());
+        assertEquals(wallet.getBalance(), walletDto.getBalance());
+        assertEquals(wallet.getName(), walletDto.getName());
+        assertEquals(wallet.getCurrencyType(), walletDto.getCurrencyType());
     }
 
     @Test
@@ -131,20 +150,20 @@ public class WalletServiceImplTest {
         cashOutRequest.setAmount(amount);
 
         Wallet wallet = new Wallet(walletId, "wallet", BigDecimal.TEN, "USD", UUID.randomUUID());
-        when(walletRepository.findById(walletId)).thenReturn(Optional.of(wallet));
+        when(walletRepository.findByIdAndUserId(walletId, USER_ID)).thenReturn(Optional.of(wallet));
         when(walletRepository.save(wallet)).thenReturn(wallet);
 
         WalletDto walletDto = walletService.cashOut(walletId, cashOutRequest);
 
-        Mockito.verify(walletRepository).findById(walletId);
+        Mockito.verify(walletRepository).findByIdAndUserId(walletId, USER_ID);
         Mockito.verify(walletRepository).save(wallet);
 
         BigDecimal expectedBalance = BigDecimal.valueOf(0.0);
-        assertEquals(expectedBalance, wallet.getBalance());
-        assertEquals(walletDto.getId(), wallet.getId());
-        assertEquals(walletDto.getBalance(), wallet.getBalance());
-        assertEquals(walletDto.getName(), wallet.getName());
-        assertEquals(walletDto.getCurrencyType(), wallet.getCurrencyType());
+        assertEquals(expectedBalance, walletDto.getBalance());
+        assertEquals(wallet.getId(), walletDto.getId());
+        assertEquals(wallet.getBalance(), walletDto.getBalance());
+        assertEquals(wallet.getName(), walletDto.getName());
+        assertEquals(wallet.getCurrencyType(), walletDto.getCurrencyType());
     }
 
 
@@ -156,10 +175,10 @@ public class WalletServiceImplTest {
         BigDecimal amount = BigDecimal.TEN;
 
         Wallet fromWallet = new Wallet(fromWalletId, "wallet", BigDecimal.TEN, "USD", UUID.randomUUID());
-        Wallet toWallet = new Wallet(toWalletId, "wallet", BigDecimal.ZERO, "USD",UUID.randomUUID());
+        Wallet toWallet = new Wallet(toWalletId, "wallet", BigDecimal.ZERO, "USD", UUID.randomUUID());
 
-        when(walletRepository.findById(fromWalletId)).thenReturn(Optional.of(fromWallet));
-        when(walletRepository.findById(toWalletId)).thenReturn(Optional.of(toWallet));
+        when(walletRepository.findByIdAndUserId(fromWalletId, USER_ID)).thenReturn(Optional.of(fromWallet));
+        when(walletRepository.findByIdAndUserId(toWalletId, USER_ID)).thenReturn(Optional.of(toWallet));
         when(walletRepository.saveAll(Arrays.asList(fromWallet, toWallet))).thenReturn(Arrays.asList(fromWallet, toWallet));
 
         walletService.transferMoney(fromWalletId, new TransferMoneyRequest(toWalletId, amount));

@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import {useDispatch} from "react-redux";
-import {appendCard} from "../../redux/cardActions";
+import {addNewCard} from "../../operations/operations";
+
 
 function NewCardModal(props) {
 
@@ -8,42 +9,9 @@ function NewCardModal(props) {
     const [cardName, setCardName] = useState('')
     const [currency, setCurrency] = useState('USD')
 
-    async function addNewCard() {
-
-        const data = {
-            walletName: cardName,
-            currencyType: currency
-        }
-
-        const requestOptions = {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization':  props.token,
-            },
-            body: JSON.stringify(data),
-        };
-
-        await fetch("http://localhost:8080/wallets", requestOptions)
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                return Promise.reject(response);
-            })
-            .then(data => {
-                console.log(data.data);
-                dispatch(appendCard(data.data));
-                props.setShowAddCard(!props.hiden);
-                props.setError(null);
-            })
-            .catch(error => {
-                error.json().then((json: any) => {
-                    console.log(json);
-                    props.setError(json.errorMessage);
-                })
-            });
+    function addNewCardOperation() {
+        addNewCard(props, dispatch, cardName, currency);
+        props.setShowAddCard(!props.hiden);
     }
 
     return (
@@ -69,7 +37,7 @@ function NewCardModal(props) {
                             </select>
                         </div>
                         <div className="col">
-                            <button type="button" onClick={addNewCard}>Add new card</button>
+                            <button type="button" onClick={addNewCardOperation}>Add new card</button>
                         </div>
                     </div>
                 </div>

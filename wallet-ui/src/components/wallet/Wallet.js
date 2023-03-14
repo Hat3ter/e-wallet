@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {Button, Modal} from "react-bootstrap";
 import {connect, useDispatch} from "react-redux";
-import {initCards} from "../../redux/cardActions";
+import {cashIn, cashOut, transfer} from "../../operations/operations";
 
 function Wallet(props) {
 
@@ -11,109 +11,32 @@ function Wallet(props) {
     const [amount, setAmount] = useState('');
     const [transferRecipientId, setTransferRecipientId] = useState(props.cards[0].id);
 
-
-    console.log("!",props.token)
-
-    const handleClose = () => {
-        setShow(!show);
-    }
-
     const handleChangeRecipient = (target) => {
         setTransferRecipientId(target.value);
-        console.log(transferRecipientId)
     }
 
-    const cashOperations = (walletId, inputCards, type, recipientId) => {
+    const cashInOperation = () => {
+        cashIn(props, dispatch, amount);
+        setShow(!show);
+        setAmount(null);
+    }
 
-        function updateBalanceAndDispatch(data) {
-            const updatedCardFromApi = data.data;
-            const cards = inputCards.map(card => {
-                if (card.id === walletId) {
-                    card.balance = updatedCardFromApi.balance;
-                }
-                return card;
-            })
-            dispatch(initCards(cards));
-        }
+    const cashOutOperation = () => {
+        cashOut(props, dispatch, amount);
+        setShow(!show)
+        setAmount(null);
+    }
 
-        const request = {amount};
-        let url = ''
-        console.log(props.token)
-        const requestOptions = {
-            method: 'PATCH',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': props.token,
-            },
-            body: JSON.stringify(request),
-        };
-
-        switch (type) {
-            case "CASH-IN":
-                url = `http://localhost:8080/wallets/${walletId}/cash-in`;
-                break;
-            case "CASH-OUT":
-                url = `http://localhost:8080/wallets/${walletId}/cash-out`;
-                break;
-            case "TRANSFER":
-                url = `http://localhost:8080/wallets/${walletId}/transfer`;
-                console.log("transferRecipientId", transferRecipientId)
-                requestOptions.body = JSON.stringify({amount, walletId: recipientId})
-                break;
-            default :
-                break;
-        }
-
-        async function asyncCashOperation(url, options) {
-
-            await fetch(url, options)
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    }
-                    return Promise.reject(response);
-                })
-                .then(data => {
-                    if (type === "TRANSFER") {
-                        const fetchData = async () => {
-                            const data = await fetch('http://localhost:8080/wallets',{
-                                method: 'GET',
-                                headers: {
-                                    'Accept': 'application/json',
-                                    'Content-Type': 'application/json',
-                                    'Authorization':  props.token,
-                                }
-                            });
-                            const json = await data.json();
-                            console.log("JSON", json.data)
-
-                            dispatch(initCards(json.data))
-                        }
-                        fetchData()
-                    } else {
-                        updateBalanceAndDispatch(data)
-                    }
-                })
-                .catch(error => {
-                    error.json().then((json: any) => {
-                        console.log(json)
-                        props.setError(json.errorMessage)
-                    })
-                });
-        }
-
-        asyncCashOperation(url, requestOptions);
-        setAmount(null)
-        handleClose();
-        props.setError(null)
-
+    const transferOperation = () => {
+        transfer(props, dispatch, amount, transferRecipientId);
+        setShow(!show)
+        setAmount(null);
     }
 
     return (
         <div className="col">
 
-            <div className={"card text-white  mb-4 card-size bg-primary"} onClick={handleClose}>
+            <div className={"card text-white  mb-4 card-size bg-primary"} onClick={() => setShow(!show)}>
                 <div className="card-header">{props.value.name ? props.value.name : 'Name'}</div>
                 <div className="card-body">
                     <h5 className="card-title">
@@ -127,7 +50,7 @@ function Wallet(props) {
                 </div>
             </div>
 
-            <Modal show={show} onHide={handleClose}>
+            <Modal show={show} onHide={() => setShow(!show)}>
 
                 <Modal.Header closeButton>
                     <Modal.Title>Card operations</Modal.Title>
@@ -148,22 +71,15 @@ function Wallet(props) {
                                    onChange={(event) => setAmount(event.target.value)}/>
                         </div>
 
-                        <Button variant="primary"
-                                onClick={() => cashOperations(props.value.id, props.cards, "CASH-IN")}>
-                            cash-in
-                        </Button>
-                        <Button variant="primary"
-                                onClick={() => cashOperations(props.value.id, props.cards, "CASH-OUT")}>
-                            cash-out
-                        </Button>
+                        <Button variant="primary" onClick={() => cashInOperation()}>cash-in</Button>
+                        <Button variant="primary" onClick={() => cashOutOperation()}>cash-out</Button>
 
                         <select className="form-select" onChange={(event) => handleChangeRecipient(event.target)}>
                             {props.cards.map(card => {
                                 return <option id={card.id} key={card.id} value={card.id}>{card.name}</option>
                             })}
                         </select>
-                        <button className="btn btn-primary" type="button"
-                                onClick={() => cashOperations(props.value.id, props.cards, "TRANSFER", transferRecipientId)}>
+                        <button className="btn btn-primary" type="button" onClick={() => transferOperation()}>
                             Transfer
                         </button>
                     </div>
@@ -180,6 +96,5 @@ function mapStateToProps(state) {
         cards: state
     };
 }
-
 
 export default connect(mapStateToProps)(Wallet);

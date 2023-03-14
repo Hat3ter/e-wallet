@@ -9,22 +9,23 @@ function App() {
 
     const [token, setToken] = useState();
 
-    if (!token) {
-        return <Login setToken={setToken}/>
+    const render = () => {
+        if (!token) {
+            return <Login setToken={setToken}/>
+        } else {
+            return <WalletList setToken={setToken} token={token}/>
+        }
     }
-
 
     return (
         <div className="App">
             <div className="container-sm">
                 <div className="row">
                     <div className="col">
-                        <WalletList setToken={setToken} token={token}/>
+                        {render()}
                     </div>
                 </div>
-
             </div>
-
         </div>
     );
 }

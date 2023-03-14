@@ -28,7 +28,7 @@ export default function Login({setToken}) {
             <div className="login-wrapper">
                 <form className="row" onSubmit={handleSubmit}>
                     <div className="mb-3">
-                        <label htmlFor="inputLogin" className="form-label">Email address</label>
+                        <label htmlFor="inputLogin" className="form-label">Login</label>
                         <input type="text" className="form-control" id="inputLogin"
                                onChange={e => setUserName(e.target.value)}/>
                     </div>

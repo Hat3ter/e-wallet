@@ -14,5 +14,5 @@ docker compose up
 ```
 
 ```
-link to * http://localhost:3000/
+link to  http://localhost:3000/ and use fallow credentials: login - admin, password - admin 
 ```

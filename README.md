@@ -12,3 +12,7 @@ cd e-wallet
 ```
 docker compose up
 ```
+
+```
+link to * http://localhost:3000/
+```

@@ -1,4 +1,4 @@
-package com.kuehne.nagel.ewalletapi.services;
+package com.kuehne.nagel.ewalletapi.services.wallet;
 
 import com.kuehne.nagel.ewalletapi.exceptions.WalletNotFoundException;
 import com.kuehne.nagel.ewalletapi.models.dtos.WalletDto;
@@ -8,8 +8,9 @@ import com.kuehne.nagel.ewalletapi.models.requests.TransferMoneyRequest;
 import com.kuehne.nagel.ewalletapi.models.requests.WalletCashInRequest;
 import com.kuehne.nagel.ewalletapi.models.requests.WalletCashOutRequest;
 import com.kuehne.nagel.ewalletapi.repositories.WalletRepository;
-import com.kuehne.nagel.ewalletapi.utils.WalletMapper;
+import com.kuehne.nagel.ewalletapi.utils.SecurityUtils;
 import com.kuehne.nagel.ewalletapi.utils.WalletOperationUtil;
+import com.kuehne.nagel.ewalletapi.utils.mapper.WalletMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +38,7 @@ public class WalletServiceImpl implements WalletService {
     @Override
     public List<WalletDto> getWalletsByUser() {
 
-        return walletRepository.findAll().stream()
+        return walletRepository.findAllByUserId(SecurityUtils.getUserId()).stream()
                 .map(WalletMapper.INSTANCE::convert)
                 .toList();
     }
@@ -46,6 +47,7 @@ public class WalletServiceImpl implements WalletService {
     @Override
     public WalletDto createWallet(CreateWalletRequest walletRequest) {
 
+        walletRequest.setUserId(SecurityUtils.getUserId());
         Wallet wallet = WalletMapper.INSTANCE.convert(walletRequest);
         Wallet savedWallet = walletRepository.save(wallet);
 
@@ -55,7 +57,7 @@ public class WalletServiceImpl implements WalletService {
     @Override
     public BigDecimal getBalance(UUID walletId) {
 
-        return walletRepository.getBalanceById(walletId);
+        return walletRepository.getBalanceByIdAndUserId(walletId, SecurityUtils.getUserId());
     }
 
     @Override
@@ -95,7 +97,7 @@ public class WalletServiceImpl implements WalletService {
 
     public Wallet getWalletByIdOrThrowException(UUID walletId) {
 
-        return walletRepository.findById(walletId)
+        return walletRepository.findByIdAndUserId(walletId, SecurityUtils.getUserId())
                 .orElseThrow(() -> new WalletNotFoundException(walletId));
     }
 

@@ -7,6 +7,8 @@ import com.kuehne.nagel.ewalletapi.models.requests.TransferMoneyRequest;
 import com.kuehne.nagel.ewalletapi.models.requests.WalletCashInRequest;
 import com.kuehne.nagel.ewalletapi.models.requests.WalletCashOutRequest;
 import com.kuehne.nagel.ewalletapi.repositories.WalletRepository;
+import com.kuehne.nagel.ewalletapi.services.wallet.WalletService;
+import com.kuehne.nagel.ewalletapi.services.wallet.WalletServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -97,18 +99,6 @@ public class WalletServiceImplTest {
     }
 
     @Test
-    public void testGetBalance() {
-
-        UUID walletId = UUID.randomUUID();
-        BigDecimal balance = BigDecimal.valueOf(100);
-        when(walletRepository.getBalanceById(walletId)).thenReturn(balance);
-
-        BigDecimal result = walletService.getBalance(walletId);
-
-        assertEquals(result, balance);
-    }
-
-    @Test
     public void testCashIn() {
 
         UUID walletId = UUID.randomUUID();
@@ -116,7 +106,7 @@ public class WalletServiceImplTest {
         WalletCashInRequest cashInRequest = new WalletCashInRequest();
         cashInRequest.setAmount(amount);
 
-        Wallet wallet = new Wallet(walletId, "wallet", BigDecimal.ZERO, "USD");
+        Wallet wallet = new Wallet(walletId, "wallet", BigDecimal.ZERO, "USD", UUID.randomUUID());
         when(walletRepository.findById(walletId)).thenReturn(Optional.of(wallet));
         when(walletRepository.save(wallet)).thenReturn(wallet);
 
@@ -140,7 +130,7 @@ public class WalletServiceImplTest {
         WalletCashOutRequest cashOutRequest = new WalletCashOutRequest();
         cashOutRequest.setAmount(amount);
 
-        Wallet wallet = new Wallet(walletId, "wallet", BigDecimal.TEN, "USD");
+        Wallet wallet = new Wallet(walletId, "wallet", BigDecimal.TEN, "USD", UUID.randomUUID());
         when(walletRepository.findById(walletId)).thenReturn(Optional.of(wallet));
         when(walletRepository.save(wallet)).thenReturn(wallet);
 
@@ -165,8 +155,8 @@ public class WalletServiceImplTest {
         UUID toWalletId = UUID.randomUUID();
         BigDecimal amount = BigDecimal.TEN;
 
-        Wallet fromWallet = new Wallet(fromWalletId, "wallet", BigDecimal.TEN, "USD");
-        Wallet toWallet = new Wallet(toWalletId, "wallet", BigDecimal.ZERO, "USD");
+        Wallet fromWallet = new Wallet(fromWalletId, "wallet", BigDecimal.TEN, "USD", UUID.randomUUID());
+        Wallet toWallet = new Wallet(toWalletId, "wallet", BigDecimal.ZERO, "USD",UUID.randomUUID());
 
         when(walletRepository.findById(fromWalletId)).thenReturn(Optional.of(fromWallet));
         when(walletRepository.findById(toWalletId)).thenReturn(Optional.of(toWallet));

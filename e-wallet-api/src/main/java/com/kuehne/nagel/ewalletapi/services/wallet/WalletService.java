@@ -1,4 +1,4 @@
-package com.kuehne.nagel.ewalletapi.services;
+package com.kuehne.nagel.ewalletapi.services.wallet;
 
 import com.kuehne.nagel.ewalletapi.models.dtos.WalletDto;
 import com.kuehne.nagel.ewalletapi.models.requests.CreateWalletRequest;

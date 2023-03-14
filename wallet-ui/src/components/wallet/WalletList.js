@@ -5,7 +5,7 @@ import {connect, useDispatch, useSelector} from "react-redux";
 import {initCards} from "../../redux/cardActions";
 import store from "../../redux/store";
 
-function WalletList() {
+function WalletList(props) {
 
     const cardSelector = useSelector(state => state.value);
     const dispatch = useDispatch();
@@ -15,7 +15,14 @@ function WalletList() {
     useEffect(() => {
 
         const fetchData = async () => {
-            const data = await fetch('http://localhost:8080/wallets');
+            const data = await fetch('http://localhost:8080/wallets',{
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization':  props.token,
+                }
+            });
             const json = await data.json();
             dispatch(initCards(json.data))
         }
@@ -41,13 +48,13 @@ function WalletList() {
             <div className="d-flex align-content-around flex-wrap">
                 {store.getState().map(value => {
                     return <div key={value.id} className="p-2">
-                        <Wallet key={value.id} value={value} setError={setError}/>
+                        <Wallet token={props.token} key={value.id} value={value} setError={setError}/>
                     </div>
                 })}
             </div>
 
             <i className="bi bi-file-plus" onClick={() => openAddCard()}></i>
-            <NewCardModal hiden={showAddCard} setShowAddCard={setShowAddCard} setError={setError}/>
+            <NewCardModal token={props.token} hiden={showAddCard} setShowAddCard={setShowAddCard} setError={setError}/>
         </div>
     )
 }

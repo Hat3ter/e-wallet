@@ -6,16 +6,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
-@Table(name = "wallets")
+@Table(name = "users")
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Wallet {
+public class User {
 
     /**
      * Id
@@ -26,26 +25,23 @@ public class Wallet {
     private UUID id;
 
     /**
-     * Wallet name
+     * email
      */
-    @Column(name = "name")
-    private String name;
+    @Column(name = "login")
+    private String login;
 
     /**
-     * Balance
+     * password encrypted
      */
-    @Column(name = "balance")
-    private BigDecimal balance;
+    @Column(name = "password")
+    private String password;
 
     /**
-     * Type of wallet currency
+     * role
      */
-    @Column(name = "currency_type")
-    private String currencyType;
+    @Column(name = "role")
+    private String role;
 
-    /**
-     * User id
-     */
-    @Column(name = "user_id")
-    private UUID userId;
+
+
 }

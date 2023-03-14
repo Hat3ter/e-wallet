@@ -1,4 +1,4 @@
-package com.kuehne.nagel.ewalletapi.utils;
+package com.kuehne.nagel.ewalletapi.utils.mapper;
 
 import com.kuehne.nagel.ewalletapi.models.dtos.WalletDto;
 import com.kuehne.nagel.ewalletapi.models.entities.Wallet;

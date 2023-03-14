@@ -1,7 +1,7 @@
 package com.kuehne.nagel.ewalletapi.models.dtos;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.kuehne.nagel.ewalletapi.utils.BalanceSerialization;
+import com.kuehne.nagel.ewalletapi.utils.serialization.BalanceSerialization;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

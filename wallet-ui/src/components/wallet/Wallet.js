@@ -11,6 +11,9 @@ function Wallet(props) {
     const [amount, setAmount] = useState('');
     const [transferRecipientId, setTransferRecipientId] = useState(props.cards[0].id);
 
+
+    console.log("!",props.token)
+
     const handleClose = () => {
         setShow(!show);
     }
@@ -35,11 +38,15 @@ function Wallet(props) {
 
         const request = {amount};
         let url = ''
-
+        console.log(props.token)
         const requestOptions = {
             method: 'PATCH',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(request)
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': props.token,
+            },
+            body: JSON.stringify(request),
         };
 
         switch (type) {
@@ -70,7 +77,14 @@ function Wallet(props) {
                 .then(data => {
                     if (type === "TRANSFER") {
                         const fetchData = async () => {
-                            const data = await fetch('http://localhost:8080/wallets');
+                            const data = await fetch('http://localhost:8080/wallets',{
+                                method: 'GET',
+                                headers: {
+                                    'Accept': 'application/json',
+                                    'Content-Type': 'application/json',
+                                    'Authorization':  props.token,
+                                }
+                            });
                             const json = await data.json();
                             console.log("JSON", json.data)
 

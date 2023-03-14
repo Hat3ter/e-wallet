@@ -17,8 +17,12 @@ function NewCardModal(props) {
 
         const requestOptions = {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(data)
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization':  props.token,
+            },
+            body: JSON.stringify(data),
         };
 
         await fetch("http://localhost:8080/wallets", requestOptions)

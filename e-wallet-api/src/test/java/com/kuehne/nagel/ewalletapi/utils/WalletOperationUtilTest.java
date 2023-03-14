@@ -3,8 +3,11 @@ package com.kuehne.nagel.ewalletapi.utils;
 import com.kuehne.nagel.ewalletapi.exceptions.InsufficientFundsException;
 import com.kuehne.nagel.ewalletapi.models.entities.Wallet;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 

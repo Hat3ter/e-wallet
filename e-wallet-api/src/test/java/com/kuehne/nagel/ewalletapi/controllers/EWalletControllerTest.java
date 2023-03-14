@@ -6,7 +6,7 @@ import com.kuehne.nagel.ewalletapi.models.requests.CreateWalletRequest;
 import com.kuehne.nagel.ewalletapi.models.requests.TransferMoneyRequest;
 import com.kuehne.nagel.ewalletapi.models.requests.WalletCashInRequest;
 import com.kuehne.nagel.ewalletapi.models.requests.WalletCashOutRequest;
-import com.kuehne.nagel.ewalletapi.services.WalletService;
+import com.kuehne.nagel.ewalletapi.services.wallet.WalletService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -80,7 +80,7 @@ public class EWalletControllerTest extends AbstractMvcTest {
         String name = "My Wallet";
         String currencyType = "USD";
         WalletDto wallet = new WalletDto(walletId, name, balance, currencyType);
-        CreateWalletRequest walletRequest = new CreateWalletRequest(name, currencyType);
+        CreateWalletRequest walletRequest = new CreateWalletRequest(name, currencyType, UUID.randomUUID());
         given(walletService.createWallet(any())).willReturn(wallet);
 
         mockMvc.perform(post("/wallets")

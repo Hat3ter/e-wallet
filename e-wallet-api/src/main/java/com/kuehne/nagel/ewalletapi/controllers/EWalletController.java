@@ -6,7 +6,7 @@ import com.kuehne.nagel.ewalletapi.models.requests.TransferMoneyRequest;
 import com.kuehne.nagel.ewalletapi.models.requests.WalletCashInRequest;
 import com.kuehne.nagel.ewalletapi.models.requests.WalletCashOutRequest;
 import com.kuehne.nagel.ewalletapi.models.response.ResponseApi;
-import com.kuehne.nagel.ewalletapi.services.WalletService;
+import com.kuehne.nagel.ewalletapi.services.wallet.WalletService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +21,6 @@ import java.util.UUID;
 /**
  * This class represents a REST controller for managing wallet operations.
  */
-@CrossOrigin
 @Slf4j
 @RestController
 @RequiredArgsConstructor

@@ -3,6 +3,7 @@ package com.kuehne.nagel.ewalletapi.utils;
 import com.kuehne.nagel.ewalletapi.models.dtos.WalletDto;
 import com.kuehne.nagel.ewalletapi.models.entities.Wallet;
 import com.kuehne.nagel.ewalletapi.models.requests.CreateWalletRequest;
+import com.kuehne.nagel.ewalletapi.utils.mapper.WalletMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;

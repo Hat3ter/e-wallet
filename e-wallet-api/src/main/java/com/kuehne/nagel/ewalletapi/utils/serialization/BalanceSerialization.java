@@ -1,4 +1,4 @@
-package com.kuehne.nagel.ewalletapi.utils;
+package com.kuehne.nagel.ewalletapi.utils.serialization;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
